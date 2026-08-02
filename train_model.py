@@ -9,20 +9,16 @@ import os
 # ==========================================
 # ENTERPRISE DATA INGESTION
 # ==========================================
-# Pointing directly to your Kaggle file
 DATASET_PATH = "phishing_email.csv"
 
 print("[*] Booting AI Training Sequence...")
 
-# Check if the massive CSV file exists in the folder
 if os.path.exists(DATASET_PATH):
     print(f"[+] Found {DATASET_PATH}! Loading massive enterprise dataset...")
     try:
-        # Read the CSV 
         df = pd.read_csv(DATASET_PATH)
-        df = df.dropna() # Remove any empty rows
+        df = df.dropna() 
         
-        # Smart Column Detection (Kaggle formats vary)
         text_col, label_col = None, None
         
         if "Email Text" in df.columns and "Email Type" in df.columns:
@@ -66,18 +62,18 @@ else:
     y_data = df["label"]
 
 # ==========================================
-# MODEL TRAINING PIPELINE
+# MODEL TRAINING PIPELINE (OPTIMIZED)
 # ==========================================
-print("[*] Vectorizing text data (TF-IDF)...")
-vectorizer = TfidfVectorizer()
+print("[*] Vectorizing text data (TF-IDF with max_features=10000)...")
+vectorizer = TfidfVectorizer(max_features=10000) # Optimized to keep file size under 100MB
 X = vectorizer.fit_transform(X_data)
 y = y_data
 
 print("[*] Splitting dataset into Training and Testing sets...")
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-print("[*] Training Advanced Random Forest Classifier (This may take a minute on large datasets)...")
-model = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1) # n_jobs=-1 uses all CPU cores!
+print("[*] Training Advanced Random Forest Classifier...")
+model = RandomForestClassifier(n_estimators=50, random_state=42, n_jobs=-1) # Optimized n_estimators
 model.fit(X_train, y_train)
 
 # Test Accuracy
@@ -91,4 +87,4 @@ print("[*] Exporting Enterprise AI Brain to disk...")
 joblib.dump(vectorizer, "tfidf_vectorizer.pkl")
 joblib.dump(model, "phishing_detector_model.pkl")
 
-print("[+] SUCCESS! New AI Brain is ready to be loaded by your IMAP Sentinel.")
+print("[+] SUCCESS! New AI Brain is ready to be loaded by your Streamlit App.")
